@@ -3,7 +3,7 @@ CFLAGS=-Wall --std=gnu99 -g
 
 all: probe
 
-probe: probe.c
+probe: probe.c args.c
 	$(CC) $(CFLAGS) -o $@ $?
 
 measure_l1: measure_l1.c
