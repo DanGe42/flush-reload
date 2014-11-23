@@ -22,6 +22,7 @@ class Gnupg < Formula
 
     ENV['CC'] = "/usr/local/bin/gcc-4.2"
     ENV['LD'] = "/usr/local/bin/gcc-4.2"
+    ENV['CFLAGS'] = "-g -O2"
 
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
