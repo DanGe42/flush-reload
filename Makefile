@@ -6,5 +6,8 @@ all: probe
 probe: probe.c
 	$(CC) $(CFLAGS) -o $@ $?
 
+measure_l1: measure_l1.c
+	$(CC) $(CFLAGS) -o $@ $?
+
 clean:
-	rm *.o probe
+	rm -f *.o probe measure_l1
