@@ -6,3 +6,4 @@
 
 Notes:
 All operations are called in mpi-pow.c -> mpi-pow.c in the main loop.
+All addresses are shifted by 0x0000000100000000 (reflected in other file)
