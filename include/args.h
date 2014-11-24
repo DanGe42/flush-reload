@@ -11,6 +11,9 @@ struct args_st {
 
     /** FILE stream of file containing addresses to probe */
     FILE *addr_file;
+
+    /** FILE stream of output file containing time slot data */
+    FILE *out_file;
 };
 
 /** Read arguments into the args_st struct. */
