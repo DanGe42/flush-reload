@@ -1,6 +1,6 @@
 # Executables output in build
-measure_l1
-probe
+bin/
+obj/
 
 # Object files
 *.o
