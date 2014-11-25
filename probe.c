@@ -40,7 +40,7 @@ int probe(char *adrs) {
     return time < PROBE_THRESHOLD;
 }
 
-int probe_timing(char *adrs) {
+unsigned long probe_timing(char *adrs) {
     volatile unsigned long time;
 
     asm __volatile__(
@@ -65,10 +65,10 @@ void spy(char **addrs, size_t num_addrs, FILE *out_file) {
     for (int slot = 0; slot < 10000; slot++) {
         for (int addr = 0; addr < (int) num_addrs; addr++) {
             char *ptr = addrs[addr];
-            int result = probe_timing(ptr);
-            fprintf(out_file, "%d %d %d\n", slot, addr, result);
+            unsigned long result = probe_timing(ptr);
+            fprintf(out_file, "%d %d %lu\n", slot, addr, result);
             if (result < PROBE_THRESHOLD) {
-                fprintf(out_file, "%d %d %d\n", slot, addr, result);
+                fprintf(out_file, "%d %d %lu\n", slot, addr, result);
             }
         }
         busy_wait(10000);
