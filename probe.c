@@ -17,12 +17,19 @@
 #define MAX_NUM_OF_ADDRS 10u
 
 // Number of time slots to record
-#define TIME_SLOTS 10000
+#define TIME_SLOTS 20000
 
 // How many cycles to busy wait
-#define BUSY_WAIT_CYCLES 500
+#define BUSY_WAIT_CYCLES 2500
 
 #define busy_wait(cycles) for(volatile long i_ = 0; i_ != cycles; i_++)\
+
+static __inline__ unsigned long long rdtsc(void)
+{
+    unsigned long long int x;
+    __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
+    return x;
+}
                                                  ;
 
 int probe(char *adrs) {
@@ -72,14 +79,23 @@ typedef struct {
 } time_slot;
 
 void spy(char **addrs, size_t num_addrs, time_slot *slots, size_t num_slots) {
-
+    unsigned long long clock = rdtsc();
+    unsigned long long old_clock;
     for (size_t slot = 0; slot < num_slots; slot++) {
+        old_clock = clock;
+        clock = rdtsc();
+        while ((clock - old_clock) < BUSY_WAIT_CYCLES) {
+            busy_wait((BUSY_WAIT_CYCLES - (clock - old_clock)) / 50);
+            clock = rdtsc();
+        }
+        if (slot % 1000 == 0) {
+            printf("slot: %d\n", slot);
+        }
         for (int addr = 0; addr < (int) num_addrs; addr++) {
             char *ptr = addrs[addr];
             unsigned long result = probe_timing(ptr);
             slots[slot].result[addr] = result;
         }
-        busy_wait(BUSY_WAIT_CYCLES);
     }
 }
 
