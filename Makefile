@@ -37,3 +37,4 @@ run: probe
 
 clean:
 	rm -f $(ODIR)/*.o $(BDIR)/*
+	rm -rf *.dSYM
