@@ -62,10 +62,15 @@ int probe_timing(char *adrs) {
 }
 
 void spy(char **addrs, size_t num_addrs, FILE *out_file) {
-    char *ptr = addrs[2];
     for (int slot = 0; slot < 10000; slot++) {
-        int result = probe_timing(ptr);
-        fprintf(out_file, "%d %d\n", slot, result);
+        for (int addr = 0; addr < (int) num_addrs; addr++) {
+            char *ptr = addrs[addr];
+            int result = probe_timing(ptr);
+            fprintf(out_file, "%d %d %d\n", slot, addr, result);
+            if (result < PROBE_THRESHOLD) {
+                fprintf(out_file, "%d %d %d\n", slot, addr, result);
+            }
+        }
         busy_wait(10000);
     }
 }
