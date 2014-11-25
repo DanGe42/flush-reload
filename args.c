@@ -52,7 +52,7 @@ void cleanup_args(struct args_st *arguments) {
 size_t read_addrs(FILE *addr_file, char **addrs, size_t maxlen) {
     size_t linecap = 24;
     ssize_t linelen = 0;
-    char *line;
+    char *line = malloc(256 * sizeof(*line));
 
     if ((linelen = getline(&line, &linecap, addr_file)) == 0) {
         return 0;
@@ -86,7 +86,7 @@ size_t read_addrs(FILE *addr_file, char **addrs, size_t maxlen) {
         }
         addrs[i] = addr;
     }
-
+    free(line);
     return num_addrs;
 }
 
