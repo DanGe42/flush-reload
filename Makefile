@@ -28,7 +28,7 @@ measure_l1: measure_l1.c
 
 run: probe
 	- rm message.txt.gpg 2>/dev/null
-	./$(GPG) -e -r "Nicholas Meyer" message.txt
+	./$(GPG) -e -r "$(RECIPIENT)" message.txt
 	./$(BDIR)/probe $(GPG) $(ADDR) out.txt && python graph.py &
 	sleep 0.01
 	./$(GPG) -d message.txt.gpg
