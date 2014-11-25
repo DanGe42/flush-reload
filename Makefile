@@ -28,10 +28,10 @@ measure_l1: measure_l1.c
 
 run: probe
 	- rm message.txt.gpg 2>/dev/null
-	./$(GPG) -e -r "Nicholas Meyer" message.txt && echo "encrypted"
+	./$(GPG) -e -r "Nicholas Meyer" message.txt
 	./$(BDIR)/probe $(GPG) $(ADDR) out.txt && python graph.py &
 	sleep 0.01
-	./$(GPG) -d message.txt.gpg && echo "decrypted"
+	./$(GPG) -d message.txt.gpg
 
 .PHONY: clean
 
