@@ -67,9 +67,6 @@ void spy(char **addrs, size_t num_addrs, FILE *out_file) {
             char *ptr = addrs[addr];
             unsigned long result = probe_timing(ptr);
             fprintf(out_file, "%d %d %lu\n", slot, addr, result);
-            if (result < PROBE_THRESHOLD) {
-                fprintf(out_file, "%d %d %lu\n", slot, addr, result);
-            }
         }
         busy_wait(2500);
     }
