@@ -8,8 +8,8 @@
 
 /** Read arguments into the args_st struct. */
 bool read_args(struct args_st *arguments, int argc, char *argv[]) {
-    if (argc != 4) {
-        fprintf(stderr, "Usage: %s GPGpath addrfile outfile\n", argv[0]);
+    if (argc != 5) {
+        fprintf(stderr, "Usage: %s GPG addr out cycles\n", argv[0]);
         goto fail;
     }
 
@@ -32,9 +32,19 @@ bool read_args(struct args_st *arguments, int argc, char *argv[]) {
         goto out_fail;
     }
 
+    char *cycles = argv[4];
+    char *endptr = NULL;
+    arguments->busy_cycles = strtol(cycles, &endptr, 10);
+    if (*endptr != '\0') {
+        fprintf(stderr, "Invalid cycles argument %s\n", cycles);
+        goto cycles_fail;
+    }
+
     return true;
 
     // Trust me, goto isn't harmful :)
+cycles_fail:
+    fclose(arguments->out_file);
 out_fail:
     fclose(arguments->addr_file);
 addr_fail:

