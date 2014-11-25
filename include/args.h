@@ -14,6 +14,9 @@ struct args_st {
 
     /** FILE stream of output file containing time slot data */
     FILE *out_file;
+
+    /** Number of cycles for the busy wait */
+    int busy_cycles;
 };
 
 /** Read arguments into the args_st struct. */
