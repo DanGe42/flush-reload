@@ -20,6 +20,7 @@
 #define TIME_SLOTS 20000
 
 #define busy_wait(cycles) for(volatile long i_ = 0; i_ != cycles; i_++)\
+                                                 ;
 
 static __inline__ unsigned long long rdtsc(void)
 {
@@ -27,7 +28,6 @@ static __inline__ unsigned long long rdtsc(void)
     __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
     return x;
 }
-                                                 ;
 
 int probe(char *adrs) {
     volatile unsigned long time;
@@ -82,12 +82,12 @@ void spy(char **addrs, size_t num_addrs, time_slot *slots, size_t num_slots,
     for (size_t slot = 0; slot < num_slots; slot++) {
         old_clock = clock;
         clock = rdtsc();
-        while ((clock - old_clock) < busy_cycles) {
+        while ((clock - old_clock) < (unsigned long long) busy_cycles) {
             busy_wait((busy_cycles - (clock - old_clock)) / 50);
             clock = rdtsc();
         }
         if (slot % 1000 == 0) {
-            printf("slot: %d\n", slot);
+            printf("slot: %lu\n", slot);
         }
         for (int addr = 0; addr < (int) num_addrs; addr++) {
             char *ptr = addrs[addr];
