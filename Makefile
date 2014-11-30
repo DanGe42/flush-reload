@@ -33,6 +33,9 @@ run: probe
 	sleep 0.01
 	$(GPG) -d message.txt.gpg
 
+noise: probe
+	$(BDIR)/probe $(GPG) $(ADDR) out.txt $(CYCLES) && python2 graph.py &
+
 .PHONY: clean
 
 clean:
