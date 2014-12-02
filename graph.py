@@ -7,8 +7,10 @@ import matplotlib.pyplot as plt
 Hit = namedtuple('Hit', ['slot', 'addr', 'time'])
 
 CUTOFF = 160
-colors = ['#FF0059', '#2C00E8', '#00F1FF', '#31D40C', '#BF9A00', '#FFFFFF']
-markers = ['x', 'x', 'o', '^', '^']
+square = {'label': 'Square', 'marker': 'x', 'color': '#FF0059', 'addrs': [0, 1]}
+red = {'label': 'Reduce', 'marker': 'o', 'color': '#2C00E8', 'addrs': [2]}
+mult = {'label': 'Multiply', 'marker': '^', 'color': '#00F1FF', 'addrs': [3, 4]}
+hit_types = [square, red, mult]
 
 with open('out.txt', 'rb') as outfile:
     probereader = csv.reader(outfile, delimiter=' ')
@@ -28,17 +30,24 @@ with open('out.txt', 'rb') as outfile:
 
     fig = plt.figure()
     axis = fig.add_subplot(111)
+    plots = []
     # Somewhat of a hack right now, but we assume that there are 5 addresses
     # range instead of xrange for forwards compatibility
     # Also, have to do each address separately because scatter() does not accept
     # a list of markers >_>
-    for addr in range(5):
-        addr_hits = [hit for hit in hits if hit.addr == addr]
-        axis.scatter(
+    for hit_type in hit_types:
+        addr_hits = [hit for hit in hits if hit.addr in hit_type['addrs']]
+        plot = axis.scatter(
             [hit.slot for hit in addr_hits],
             [hit.time for hit in addr_hits],
-            c=colors[addr],
-            marker=markers[addr],
+            c=hit_type['color'],
+            marker=hit_type['marker'],
         )
+        plots.append(plot)
     # plt.plot([hit.slot for hit in hits], [hit.time for hit in hits])
+    plt.legend(tuple(plots),
+               tuple([hit_type['label'] for hit_type in hit_types]),
+               scatterpoints=1,
+               loc='upper right',
+               ncol=1)
     plt.show()
