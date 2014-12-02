@@ -26,6 +26,10 @@ measure_l1: measure_l1.c
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $(BDIR)/$@ $?
 
+timings: $(ODIR)/args.o $(ODIR)/timings.o
+	mkdir -p $(BDIR)
+	$(CC) $(CFLAGS) -o $(BDIR)/$@ $^
+
 run: probe
 	- rm message.txt.gpg 2>/dev/null
 	$(GPG) -e -r "$(RECIPIENT)" message.txt
