@@ -17,7 +17,7 @@
 #define MAX_NUM_OF_ADDRS 10u
 
 // Number of time slots to record
-#define TIME_SLOTS 20000
+#define TIME_SLOTS 40000
 
 #define busy_wait(cycles) for(volatile long i_ = 0; i_ != cycles; i_++)\
                                                  ;

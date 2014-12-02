@@ -1,5 +1,6 @@
 0x493068 mpih-mul.c:253 (mpih_sqr_n_basecase)
+0x493266 mpih-mul.c:287 (mpih_sqr_n)
 0x493266 mpih-mul.c:318 (mpih_sqr_n)
 0x492250 mpih-div.c:382 (mpihelp_divrem)
-0x493650 mpih-mul.c:505 (mpihelp_mul)
-0x4938c1 mpih-mul.c:412 (mpihelp_mul_karatsuba_case)
+0x493650 mpih-mul.c:523 (mpihelp_mul)
+0x4938c1 mpih-mul.c:397 (mpihelp_mul_karatsuba_case)
