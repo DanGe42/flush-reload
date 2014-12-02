@@ -1,0 +1,6 @@
+mpih-mul.c:253 (mpih_sqr_n_basecase)
+mpih-mul.c:287 (mpih_sqr_n)
+mpih-mul.c:318 (mpih_sqr_n)
+mpih-div.c:382 (mpihelp_divrem)
+mpih-mul.c:500 (mpihelp_mul)
+mpih-mul.c:397 (mpihelp_mul_karatsuba_case)

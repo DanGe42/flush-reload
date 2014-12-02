@@ -1,9 +1,0 @@
-0x0000000100099d36 mpih-mul.c:253 (mpih_sqr_n_basecase)
-0x000000010009a0d4 mpih-mul.c:318 (mpih_sqr_n)
-0x000000010009946d mpih-div.c:382 (mpihelp_divrem)
-0x000000010009aad7 mpih-mul.c:505 (mpihelp_mul)
-0x000000010009a811 mpih-mul.c:412 (mpihelp_mul_karatsuba_case)
-
-Notes:
-All operations are called in mpi-pow.c -> mpi-pow.c in the main loop.
-All addresses are shifted by 0x0000000100000000 (reflected in other file)
