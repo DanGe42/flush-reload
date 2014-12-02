@@ -29,7 +29,7 @@ measure_l1: measure_l1.c
 run: probe
 	- rm message.txt.gpg 2>/dev/null
 	$(GPG) -e -r "$(RECIPIENT)" message.txt
-	$(BDIR)/probe $(GPG) $(ADDR) out.txt $(CYCLES) && python2 graph.py &
+	$(BDIR)/probe $(GPG) $(ADDR) out.txt $(CYCLES) && python graph.py &
 	sleep 0.01
 	$(GPG) -d message.txt.gpg
 
