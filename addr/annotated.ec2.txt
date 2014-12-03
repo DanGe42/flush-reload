@@ -1,0 +1,3 @@
+0x08fbd0 (end of mpih_sqr_n_basecase)
+0x08ed90 (end of mpihel_divrem)
+0x090511 (end of mpihelp_karatsuba_case)
