@@ -3,6 +3,10 @@ from __future__ import print_function
 from collections import namedtuple
 import csv
 import matplotlib.pyplot as plt
+import sys
+
+
+inputfile = sys.argv[1] if len(sys.argv) == 2 else 'out.txt'
 
 Hit = namedtuple('Hit', ['slot', 'addr', 'time'])
 
@@ -12,7 +16,7 @@ red = {'label': 'Reduce', 'marker': '.', 'color': '#2C00E8', 'addrs': [1]}
 mult = {'label': 'Multiply', 'marker': '^', 'color': '#00F1FF', 'addrs': [2]}
 hit_types = [square, red, mult]
 
-with open('out.txt', 'rb') as outfile:
+with open(inputfile, 'rb') as outfile:
     probereader = csv.reader(outfile, delimiter=' ')
     rows = [Hit(slot=int(row[0]), addr=int(row[1]), time=int(row[2]))
             for row in probereader]
