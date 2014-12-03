@@ -10,7 +10,7 @@ inputfile = sys.argv[1] if len(sys.argv) == 2 else 'out.txt'
 
 Hit = namedtuple('Hit', ['slot', 'addr', 'time'])
 
-CUTOFF = 120
+CUTOFF = 80
 square = {'label': 'Square', 'marker': 'x', 'color': '#FF0059', 'addrs': [0]}
 red = {'label': 'Reduce', 'marker': '.', 'color': '#2C00E8', 'addrs': [1]}
 mult = {'label': 'Multiply', 'marker': '^', 'color': '#00F1FF', 'addrs': [2]}
@@ -30,7 +30,6 @@ with open(inputfile, 'rb') as outfile:
     print("Slots >= 2 {:d}".format(len([s for s in seen.keys() if seen[s] >= 2])))
     print("Slots == 0 {:d}".format(len([s + 1 for s in seen.keys() if (s + 1) not in seen])))
     print("Slots, tot {:d}".format(len(seen)))
-    hits = hits[30:-30]
 
     for hit_type in hit_types:
         hits_of_type = [hit for hit in hits if hit.addr in hit_type['addrs']]
