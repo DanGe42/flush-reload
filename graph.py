@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 Hit = namedtuple('Hit', ['slot', 'addr', 'time'])
 
 CUTOFF = 120
-square = {'label': 'Square', 'marker': 'o', 'color': '#FF0059', 'addrs': [0, 1, 2]}
-red = {'label': 'Reduce', 'marker': 'o', 'color': '#2C00E8', 'addrs': [3]}
-mult = {'label': 'Multiply', 'marker': '^', 'color': '#00F1FF', 'addrs': [4, 5]}
+square = {'label': 'Square', 'marker': 'x', 'color': '#FF0059', 'addrs': [0]}
+red = {'label': 'Reduce', 'marker': '.', 'color': '#2C00E8', 'addrs': [1]}
+mult = {'label': 'Multiply', 'marker': '^', 'color': '#00F1FF', 'addrs': [2]}
 hit_types = [square, red, mult]
 
 with open('out.txt', 'rb') as outfile:

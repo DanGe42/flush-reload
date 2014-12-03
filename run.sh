@@ -9,7 +9,8 @@ CYCLES=$1
 bin/probe ${GPG} ${ADDR} ${OUT} ${CYCLES} &
 PROBE_PID=$!
 
-${GPG} --yes --sign ${MESSAGE} &
+sleep 0.01
+(echo "GPG start"; ${GPG} --yes --sign ${MESSAGE}; echo "GPG end") &
 GPG_PID=$!
 
 trap "echo 'Received signal'; kill -TERM ${PROBE_PID} ${GPG_PID}" \
