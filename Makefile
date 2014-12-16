@@ -31,12 +31,13 @@ timings: $(ODIR)/args.o $(ODIR)/timings.o
 	$(CC) $(CFLAGS) -o $(BDIR)/$@ $^
 
 run: probe
+	- rm message.txt.gpg 2>/dev/null
 	$(BDIR)/probe $(GPG) $(ADDR) out.txt $(CYCLES) && python graph.py &
 	sleep 0.01
 	$(GPG) --sign message.txt
 
 noise: probe
-	$(BDIR)/probe $(GPG) $(ADDR) out.txt $(CYCLES) && python2 graph.py &
+	$(BDIR)/probe $(GPG) $(ADDR) out.txt $(CYCLES) && python graph.py &
 
 .PHONY: clean
 

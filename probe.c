@@ -95,6 +95,9 @@ void spy(char **addrs, size_t num_addrs, time_slot *slots, size_t num_slots,
         int busy_cycles) {
     unsigned long long clock = rdtsc();
     unsigned long long old_clock;
+    unsigned long long avg = 0;
+    unsigned long long large = 0;
+    unsigned long long start = clock;
     for (size_t slot = 0; slot < num_slots; slot++) {
         old_clock = clock;
         clock = rdtsc();
@@ -102,6 +105,10 @@ void spy(char **addrs, size_t num_addrs, time_slot *slots, size_t num_slots,
             busy_wait((busy_cycles - (clock - old_clock)) / 50);
             clock = rdtsc();
         }
+        if ((clock - old_clock) > 2000 && slot > 9000 && slot < 15000) {
+            large += 1;
+        }
+        avg = (avg * slot + (clock - old_clock)) / (slot + 1);
         if (slot % 1000 == 0) {
             printf("slot: %lu\n", slot);
         }
@@ -111,6 +118,9 @@ void spy(char **addrs, size_t num_addrs, time_slot *slots, size_t num_slots,
             slots[slot].result[addr] = result;
         }
     }
+    printf("avg: %llu\n", avg);
+    printf("avg: %llu\n", large);
+    printf("elapsed: %llu\n", rdtsc() - start);
 }
 
 #endif

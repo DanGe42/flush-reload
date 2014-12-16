@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 import csv
 import matplotlib.pyplot as plt
 import sys
@@ -30,6 +30,24 @@ with open(inputfile, 'rb') as outfile:
     print("Slots >= 2 {:d}".format(len([s for s in seen.keys() if seen[s] >= 2])))
     print("Slots == 0 {:d}".format(len([s + 1 for s in seen.keys() if (s + 1) not in seen])))
     print("Slots, tot {:d}".format(len(seen)))
+
+    addr_counts = defaultdict(int)
+    for hit in hits:
+        addr_counts[hit.addr + 1] += 1
+    print("Counts for each address:", addr_counts)
+
+    multiplies = [hit for hit in hits if hit.addr in mult['addrs']]
+    slots_to_multiplies = {}
+    for multiply in multiplies:
+        slots_to_multiplies[multiply.slot] = multiply
+    multiply_slots = sorted(slots_to_multiplies.keys())
+    dists = {}
+    for i in xrange(0, len(multiply_slots) - 1):
+        dist = multiply_slots[i + 1] - multiply_slots[i]
+        if dist not in dists:
+            dists[dist] = 0
+        dists[dist] += 1
+    print("Counts for each distance between subsequent multiplies (in slots)", dists)
 
     for hit_type in hit_types:
         hits_of_type = [hit for hit in hits if hit.addr in hit_type['addrs']]
