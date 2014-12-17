@@ -49,12 +49,11 @@ Channel Attack On GnuPG}
 \begin{abstract}
 
     In their paper, Yarom and Falkner\cite{YF13} presented a side channel
-    attack, which they named \flushreload{} on the L3 caches of Intel x86
-    processors. The attack takes advantage of content-based memory page sharing
-    between non-trusting processes to monitor memory accesses of the victim
-    process. This technique can be used on GnuPG pre-1.4.14 to identify the
-    binary sequence of a RSA private exponent by discerning which branches are
-    taken.
+    attack, named \flushreload{}, on the L3 caches of Intel x86 processors. The
+    attack takes advantage of content-based memory page sharing between
+    non-trusting processes to monitor memory accesses of a victim process. This
+    technique can be used on GnuPG pre-1.4.14 to identify the binary sequence of
+    an RSA private exponent by discerning which branches are taken.
 
     In this paper, we demonstrate an implementation of the \flushreload{}
     technique and apply it on a few platforms. Confirming the results from the
@@ -79,24 +78,22 @@ miss that goes all the way out to system RAM may take as long as 50ns, 100 times
 slower.
 
 A typical cache architecture is laid out in three levels, generally referred to
-as the \textit{L1}, \textit{L2}, and \textit{L3}. The L3 cache is usually the
-largest of the three, then the L2, and finally the L1; L1 and L2 caches are also
-generally allocated on a per-core basis in the case of multi-core CPUs, whereas
-the L3 cache is usually shared between all cores, as it is the largest. L1
-caches are also typically divided into \textit{instruction} sections and
-\textit{data} sections, each reserved for that particular type of instruction.
-It is equally important for instruction memory as well as data memory to be
-cached, as both require fast access in order for the CPU to be performant. For
-example, the Intel Haswell i7 4600U CPU has a 128KiB L1 cache, divided into two
-64KiB caches for instructions and data; a 512KiB L2 cache, and a 4MiB L3 cache.
+as the \textit{L1}, \textit{L2}, and \textit{L3}. The L3 cache is usually larger
+than than the L2, which itself is usually larger than the L1; L1 and L2 caches
+are also generally allocated on a per-core basis in the case of multi-core CPUs,
+whereas the L3 cache is usually shared between all cores.  L1 caches are also
+typically divided into \textit{instruction} sections and \textit{data} sections,
+each reserved for that particular type of instruction.  It is equally important
+for instruction memory as well as data memory to be cached, as both require fast
+access in order for the CPU to be performant. For example, the Intel Haswell i7
+4600U CPU has a 128KiB L1 cache, divided into two 64KiB caches for instructions
+and data; a 512KiB L2 cache, and a 4MiB L3 cache.
 
-Naturally, the closer a cache is to a core, the lower the latency in accessing
-that cache by the core, as there are fewer buses to traverse.  On Intel
-architectures, the caches are also \textit{inclusive} in their data, so as to
-aid in cache coherence, i.e.  ensuring data coherence in the cache across cores.
-Cache inclusivity means that whatever data is contained in a core's L1 cache
-will also be contained in the core's L2 cache as well as the CPU's L3 cache.
-Therefore, when data gets evicted from the L3 cache, it will also be evicted
+Naturally, a cache closer to a core has a lower access latency because the core
+has to traverse fewer buses. On Intel architectures, the caches are considered
+\textit{inclusive}, meaning that whatever data is contained in a core's L1 cache
+will also be contained in the core's L2 cache and the CPU's L3 cache.
+Therefore, when data are evicted from the L3 cache, they will also be evicted
 from the L2 and L1 caches.
 
 \begin{figure}[h]
@@ -112,19 +109,18 @@ from the L2 and L1 caches.
 \subsection{Page sharing} % David
 
 Modern operating systems also implement a technique known as \textit{page
-sharing}, which helps to reduce the memory footprint of running processes by
-avoiding replicating pages of memory that are already allocated. Page sharing
-may also be used as an efficient, safe channel between two co-operating
-processes.
+sharing}, which helps reduce the memory footprint of running processes by
+avoiding redundant replication of memory pages. Page sharing may also be used as
+an efficient, safe channel between two co-operating processes.
 
-Windows, Linux, and possibly OS X \footnote{It is unclear whether or not OS X
+Windows, Linux, and possibly OS X\footnote{It is unclear whether or not OS X
 implements page deduplication, but as far as we can tell it does} also perform a
 more aggressive form of page sharing known as \textit{page deduplication}. With
 this scheme, the operating system scans memory pages during idle CPU cycles, and
-looks for pages that are identical in content. It then collapses them into one
-singular page that is then shared by all processes that are accessing the
-content of that particular page. As a result of this page deduplication scheme,
-processes may be unknowingly or unintentionally sharing memory with each other.
+looks for pages that are identical in content. It collapses those pages into a
+single page that is then shared by all processes that were accessing those
+identical pages. As a result of this page deduplication scheme,
+processes may be unknowingly or unintentionally sharing memory with one another.
 However, to prevent malicious access to the shared pages, the operating system
 maps shared pages as copy-on-write; that is, when a process wishes to write to a
 page, it must first make a local copy for itself that it can safely modify. When
@@ -135,7 +131,7 @@ modify the targeted page.
 
 \subsection{RSA}
 
-RSA is a standard algorithm for public key encryption. The scheme works as
+RSA is a standard cryptosystem for public key encryption. The scheme works as
 follows. Choose two distinct prime numbers, $p$ and $q$.
 
 \begin{enumerate}
@@ -143,7 +139,7 @@ follows. Choose two distinct prime numbers, $p$ and $q$.
     \item Compute $\phi(N) = \phi(p)\phi(q) = (p-1)(q-1)$
     \item Choose $e, 1 \leq e \leq \phi(N)$, where $gcd(e,\phi(N)) = 1$.
     \item Compute $d = e^{-1}\ mod\ \phi(N)$
-    \item Let the private key be (d,N) and the public key be (e,N)
+    \item Let the private key be $(d,N)$ and the public key be $(e,N)$
 \end{enumerate} 
 
 Encryption can be performed by calculating $c = m^e\ mod\ N$. Likewise,
@@ -156,14 +152,14 @@ would then take $O(d)$ multiplications. However, there exists a much more
 efficient algorithm known as Square-and-Multiply\cite{Knuth:1997:ACP:270146}.
 This method is derived from the binary representation of the exponent $d$.
 Consider $d = \sum_{i=0}^{n-1}x_i 2^i$. Then $c^d = c^{(\sum_{i=0}^{n-1}x_i
-2^i)} = \prod_{i=0}^{n-1}c^{x_i 2^i}$. Then reducing modulo $N$ we get obtain
+2^i)} = \prod_{i=0}^{n-1}c^{x_i 2^i}$. Then reducing modulo $N$ we obtain
 $m$ as desired. The following code shows GnuPG 1.4.13's implementation of
 Square-and-Multiply. We can proceed to implement the algorithm by scanning the
 binary representation of $d$ from right to left. If the bit is $1$, we will
 multiply and then square, and if the bit is a $0$, we will just square.
 Inserting reduces to keep memory use manageble, we see that when the bit is $1$,
-we will multiply, reduce, square, and reduce, and when the bit is $0$, we will
-square, and then reduce.
+we will square, reduce, multiple, and reduce, and when the bit is $0$, we will
+only square and reduce.
 
 \begin{lstlisting}[caption={GnuPG 1.4.13's implementation of Square-and-Multiply
     (excerpted)}]
@@ -178,13 +174,13 @@ e <<= 1
 
 \subsection{GnuPG}
 
-GnuPG (Gnu Privacy Guard) is a free implementation of PGP. As such, GnuPG allows
+GnuPG (GNU Privacy Guard) is a free implementation of PGP. As such, GnuPG allows
 for encryption, signing, and decryption of messages. It implements several
 public key algorithms, including DSA, ElGamal, and importantly for our purposes,
 RSA. As mentioned above, in particular, the GnuPG implementation of RSA uses
 Square-and-Multiply for modular exponentiation. As of GnuPG version 1.4.14, the
-if switch guarding the multiply and reduce no longer prevents that branch from
-being taken, rather, in the case of the bit being a $0$, it will simply discard
+\texttt{if} branch guarding the multiply and reduce no longer prevents that branch from
+being taken; rather, in the case of the bit being a $0$, it will simply discard
 the results of the multiply in the reduce. This was a consequence of the
 publication of the \flushreload{} attack by Yarom and Falkner\cite{YF13} that we
 will describe momentarily.
@@ -200,12 +196,11 @@ The \flushreload{} attack takes advantage of page deduplication on modern
 processors. The basic attack works as follows. The attacker loads into memory
 some block of data that it believes the victim to also be accessing. The system
 then deduplicates these two identical pages. The attacker can then use the
-instruction \texttt{clflush} to flush this from its $L1$ cache, which flushes it
-from the $L3$ cache, and consequently the $L1$ cache of the victim as well. The
-attacker then waits for some time slot $T$, and attempts to access a cache line
+instruction \texttt{clflush} to flush memory lines in that block from the CPU caches. The
+attacker then waits for some time $T$ and attempts to access a memory line
 in this page, and measures the time (in cycles) it takes for the line to be
-loaded. If the cache line was accessed by the victim during $T$, the time taken
-will be shorter, and if it was not accessed, the time taken will be longer.
+loaded. If the memory line was accessed by the victim during $T$, the time taken
+will be shorter because it will be cached, and if it was not accessed, the time taken will be longer.
 Consequently, the attacker can determine if the line was accessed during $T$.
 
 If the attacker loads into memory some subset of instructions from the victim
@@ -229,7 +224,7 @@ key is indeed recoverable.
 Our implementation of the \flushreload{} technique is an adaptation of the
 implementation as described in Yarom and Falkner\cite{YF13}. In the original
 implementation, the \texttt{probe} function measures the time taken to access a
-given address, immediately flushes the corresponding cache line, and returns
+given address, immediately flushes the corresponding memory line from the cache, and returns
 whether the cycles elapsed stays within a fixed threshold.  We make a minor
 modification to the \texttt{probe} function---returning the number of cycles
 elapsed instead of the result of the thresholding---to allow us to obtain data
@@ -309,7 +304,7 @@ compiled with GCC 4.9.2 (installed via \texttt{pacman} from the official Arch
 package repositories ``Core'' install group).
 
 Leaving debug symbols in the executable made it easier to map the relevant GPG
-source code lines to corresponding addresses of the instructions in the binary's
+source code lines to the addresses of the corresponding instructions in the binary's
 .text section. GPG performance is not affected because these symbols are removed
 at runtime. Finding the relevant instructions is still possible in a stripped
 GPG executable, though it will require some reverse engineering.
@@ -361,51 +356,43 @@ successive 0s or a single 1. The only way to resolve this ambiguity is capture
 another GPG signing/decryption session with the same key and compare the
 results.
 
-Unfortunately, while the Python script that we developed to interpret these
-results was able to recover many of the bits in $d_p$ and $d_q$, there were too
-many errors in recovery to reliably reconstruct the original private RSA
-exponent.
-
-
 \subsection{Other Platforms}
 
 \subsubsection{OS X}
 
 We were unable to extract any binary strings from the OS X results. However,
-they looked promising, and we believe that page deduplication is happening
-properly, so with further experimentation, the modulus might be extracted. There
-are a few reasons we believe this to be the case. First, on many runs the
+the output timing data looked promising and leads us to believe that OS X does
+implement page deduplication. On many runs the
 proportions of square, reduce, and multiplies were correct. A random assortment
 of bits in the modulus combined with the access patterns of the algorithm should
 produce a particular ratio, roughly $4:2:1$ reduces to squares to multiplies,
-and we did observe this. Furthermore, by tweaking the probe placement and
+which we did observe. Furthermore, by tweaking the probe placement and
 timing, the number of accesses observed per slot was between 1 and 2 on average,
 which is close to the ideal of exactly one access per slot. Lastly, the banding
 by cache level was very evident, similar to the EC2 results above. There was
 little ambiguity about which probes resulted in cache hits and which did not.
 
-As of writing, we did not examine the assembly of the GnuPG binary to optimally
-place probes, rather, we used the method of setting breakpoints in GDB by line
+As of writing, we did not examine the assembly of the GnuPG binary on OS X for
+optimal probe placement; rather, we used the method of setting breakpoints in GDB by line
 number and observing the addresses on which they were set. It is possible that
-switching methods would have produced clean enough results to retrieve the
-mdodulus.
+switching methods would produce better results.
 
 \subsubsection{Arch Linux}
 
-Arch Linux provided the poorest results by far. No meaningful data was
-discernible under any configuration, as there is timing noise for the entire
-duration of spying, which in the case of the figure below, occurred roughly
-between timeslots 7000 and 18000 on the x-axis.. Furthermore, it was fairly
-opaque as to why this was occurring, as there were no significant differences
-between this and the configuration running on OS X. The largest obvious
+Arch Linux provided the poorest results by far. No meaningful data were
+discernible under any configuration because there was too much timing noise
+during the spying, which, in the case of the Figure~\ref{fig:data-arch}, occurred roughly
+between timeslots 7000 and 18000 on the x-axis. Given that there were no
+significant differences between this and the configuration running on OS X, we
+were unsure why this kept occurring. The most obvious
 difference between the two systems is that GnuPG on Arch Linux was compiled
-under GCC 4.9.2, as opposed to GCC 4.2 on OS X; however, it is not clear how
-this would change the output this drastically, or if it did at all. Two
-additional hypotheses for why this behaviour was exhibited were that Arch Linux
+under GCC 4.9.2 instead of GCC 4.2, as it was on OS X; however, it was not clear how
+this would change the output so drastically, or if it did at all. Our two
+hypotheses for this behaviour were that Arch Linux
 was being run as a guest OS on a Windows 8.1 host, and that it was being run on
-a Haswell-series Intel i7, which might require compiling the GnuPG binary
-differently and therefore might exhibit different behaviour, as this CPU series
-did not exist at the time of the original paper's publishing.  However, both of
+a Haswell-series Intel i7, which could have affected GCC's compilation of GnuPG
+because this CPU series
+did not exist at the publication time of the original paper.  However, both of
 these hypotheses were disproven by testing on a second machine running Arch
 Linux as a host OS on an older Intel Celeron CPU, in which the attack produced
 the same noisy results.
@@ -419,12 +406,10 @@ the same noisy results.
 
 \subsection{Analysis}
 
-\lobwatermark
-
 Our results were quite sensitive to probe placement. The ideal probing addresses
-are the ones that are always executed when the targeted operation
+are the ones that are always executed when the targeted operations
 (\texttt{mpih\_sqr\_n\_basecase}, \texttt{mpihelp\_divrem}, and
-\texttt{mpihelp\_mul\_karatsuba\_case}) is executed. Finding these addresses,
+\texttt{mpihelp\_mul\_karatsuba\_case}) are executed. Finding these addresses,
 however, was not as straightforward as we thought it would be.
 
 Since GPG is built with \texttt{-O2} optimzations, the assembly output does not
@@ -432,16 +417,17 @@ map one-to-one with the lines of source code; optimizations tend to do a
 considerable amount of assembly ``jumbling'' (duplication, rearrangement, and
 inlining of code). As a result, we found that setting probes to within
 frequently accessed addresses, such as within loop bodies as suggested by Yarom
-and Falkner\cite{YF13}, did not work as well as expected.
+and Falkner\cite{YF13}, did not work as well as we expected.
 
-Many of our preliminary results were plagued by a lot of noise, a lot of which
+Many of our preliminary results were plagued by a lot of noise, much of which
 resulted from speculative execution. To reduce the effects of this, we attempted
 to probe the very close to the ends of the respective functions. We found that
 simply setting breakpoints to the relevant lines in GDB would not yield good
 addresses to probe. Even setting a breakpoint to the last line of the function
 in the source would not return an address of an instruction close to the return.
-To find the best addresses, we disassembled the GPG binary and located addresses
-near each function's \texttt{retq} instruction.
+To find the best addresses, we disassembled the GPG binary using
+\texttt{objdump} and located addresses near each function's \texttt{retq}
+instruction.
 
 \begin{lstlisting}[language={[x86masm]Assembler},
     caption={A probe at \texttt{0x08ed90} near the end of
@@ -456,22 +442,27 @@ near each function's \texttt{retq} instruction.
 48ed9e: retq	; end of function, almost always executed
 \end{lstlisting}
 
+We developed a Python script to analyze the timing data. While the script was
+able to recover many of the bits in $d_p$ and $d_q$, there were too many errors
+in recovery preventing us from reliably reconstructing the private RSA exponent.
+Further work will be needed to improve the robustness of the script.
 
 \section{Conclusions}
 
 We successfully reproduced parts of the \flushreload{} attack. While results
 were mixed on various platforms, we found moderate success on EC2, which, in
-particular, is an interesting environment vulnerable to this type of attack
-because of its shared hardware access through a VM. Though GnuPG has fixed this
-vulnerability starting at version 1.4.14, this shows that other binaries running
-on EC2 may prove vulnerable.
+particular, is an interesting environment vulnerable to this type of attack;
+it shares hardware access with other guest VMs on the same host, opening the
+possibility of a cross-VM attack. Although this vulnerability was fixed in GnuPG
+version 1.4.14, this shows that other programs running on EC2 may be susceptible
+to this technique.
 
 We have endeavored to provide more details on some parts of the implementation
-of this attack so as to reduce the barrier to future reproductions and
+of this attack to reduce the barrier to future reproductions and
 extensions of these results. Additionally, full source code is available upon
 request.
 
-\section{Future Work} % David
+\section{Future Work}
 
 A possible future application of the \flushreload{} technique would be to
 perform this attack across virtual machines. That is, using the attack to steal
@@ -479,8 +470,8 @@ data from one virtual machine whilst running the attack on another. Cross-VM
 attacks are described in further detail by Apecechea et al.
 \cite{cryptoeprint:2014:248}; the basic principle behind the attack would be to
 detect and spy upon a victim, i.e. a user on another VM, running GnuPG (or some
-equivalent cryptographic process) and steal the keys used in the process.  Such
-an attack clearly has its appeal-- it would expose a major vulnerability in
+equivalent cryptographic process) and steal the keys used in the process. Such
+an attack clearly has its appeal: it would expose a major vulnerability in
 virtual machines, which are used in countless modern software applications.
 
 Alternatively, \flushreload{} could be used generally to spy on arbitrary
