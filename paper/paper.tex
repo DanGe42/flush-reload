@@ -87,7 +87,7 @@ each reserved for that particular type of instruction.  It is equally important
 for instruction memory as well as data memory to be cached, as both require fast
 access in order for the CPU to be performant. For example, the Intel Haswell i7
 4600U CPU has a 128KiB L1 cache, divided into two 64KiB caches for instructions
-and data; a 512KiB L2 cache, and a 4MiB L3 cache.
+and data; a 512KiB L2 cache; and a 4MiB L3 cache.
 
 Naturally, a cache closer to a core has a lower access latency because the core
 has to traverse fewer buses. On Intel architectures, the caches are considered
@@ -126,8 +126,8 @@ maps shared pages as copy-on-write; that is, when a process wishes to write to a
 page, it must first make a local copy for itself that it can safely modify. When
 a write is requested, the CPU traps to the kernel, which then remaps a copy of
 the desired page for the process requesting the write, and then returns control
-to the calling process. Read operations in this scheme are safe, as they do not
-modify the targeted page.
+to the calling process. Read operations in this scheme do not require such a trap
+as they do not modify the targeted page and are therefore ``safe''.
 
 \subsection{RSA}
 
@@ -193,7 +193,7 @@ can easily recover $m$.
 \subsection{\flushreload{}}
 
 The \flushreload{} attack takes advantage of page deduplication on modern
-processors. The basic attack works as follows. The attacker loads into memory
+processors. The basic attack works as follows: the attacker loads into memory
 some block of data that it believes the victim to also be accessing. The system
 then deduplicates these two identical pages. The attacker can then use the
 instruction \texttt{clflush} to flush memory lines in that block from the CPU caches. The
@@ -273,18 +273,18 @@ void spy(char **addrs, size_t num_addrs, int busy_cycles) {
 \end{lstlisting}
 
 We also attempted to enforce the fixed slot by dynamically adjusting the busy
-wait time based on how long all of the probes took. While, in theory, this
-technique would yield better results by ensuring that we take cache timing
-readings uniformly, in practice, this did not yield significantly better
+wait time based on how long all of the probes took. While in theory this
+technique should yield better results by ensuring that we take cache timing
+readings uniformly, in practice it did not yield significantly better
 results.
 
 \subsection{Setup}
 
 Because the particular \flushreload{} side channel vector, the modular
 exponentiation function, that we (and Yarom and Falkner\cite{YF13}) were
-targeting was mitigated in GPG 1.4.14, we used GPG 1.4.12. We built GPG with the
-default compilation flags, which included building with \texttt{-O2}
-optimizations and debug flags.
+targeting was mitigated in GPG 1.4.14, we used GPG 1.4.12. We built GPG 
+using GCC with the default compilation flags, which included
+building with \texttt{-O2} optimizations and debug flags.
 
 We attempted our attack on four hardware setups:
 \begin{itemize}
@@ -387,8 +387,9 @@ significant differences between this and the configuration running on OS X, we
 were unsure why this kept occurring. The most obvious
 difference between the two systems is that GnuPG on Arch Linux was compiled
 under GCC 4.9.2 instead of GCC 4.2, as it was on OS X; however, it was not clear how
-this would change the output so drastically, or if it did at all. Our two
-hypotheses for this behaviour were that Arch Linux
+this would change the output so drastically, or if it did at all.
+
+Our two hypotheses for this different behaviour were that Arch Linux
 was being run as a guest OS on a Windows 8.1 host, and that it was being run on
 a Haswell-series Intel i7, which could have affected GCC's compilation of GnuPG
 because this CPU series
@@ -396,6 +397,10 @@ did not exist at the publication time of the original paper.  However, both of
 these hypotheses were disproven by testing on a second machine running Arch
 Linux as a host OS on an older Intel Celeron CPU, in which the attack produced
 the same noisy results.
+
+Additionally, it may be the case that the addresses determined with GDB were inaccurate,
+and that probing based on addresses determined via \texttt{objdump} would produce
+better results.
 
 \begin{figure}[h]
   \centering
@@ -423,7 +428,7 @@ Many of our preliminary results were plagued by a lot of noise, much of which
 resulted from speculative execution. To reduce the effects of this, we attempted
 to probe the very close to the ends of the respective functions. We found that
 simply setting breakpoints to the relevant lines in GDB would not yield good
-addresses to probe. Even setting a breakpoint to the last line of the function
+addresses to probe. Even setting a breakpoint on the last line of the function
 in the source would not return an address of an instruction close to the return.
 To find the best addresses, we disassembled the GPG binary using
 \texttt{objdump} and located addresses near each function's \texttt{retq}
