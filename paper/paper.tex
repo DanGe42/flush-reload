@@ -197,7 +197,7 @@ processors. The basic attack works as follows: the attacker loads into memory
 some block of data that it believes the victim to also be accessing. The system
 then deduplicates these two identical pages. The attacker can then use the
 instruction \texttt{clflush} to flush memory lines in that block from the CPU caches. The
-attacker then waits for some time $T$ and attempts to access a memory line
+attacker then waits for some interval $T$ and attempts to access a memory line
 in this page, and measures the time (in cycles) it takes for the line to be
 loaded. If the memory line was accessed by the victim during $T$, the time taken
 will be shorter because it will be cached, and if it was not accessed, the time taken will be longer.
