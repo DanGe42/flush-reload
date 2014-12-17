@@ -114,7 +114,7 @@ avoiding redundant replication of memory pages. Page sharing may also be used as
 an efficient, safe channel between two co-operating processes.
 
 Windows, Linux, and possibly OS X\footnote{It is unclear whether or not OS X
-implements page deduplication, but as far as we can tell it does} also perform a
+implements page deduplication, but there are indications that it does.} also perform a
 more aggressive form of page sharing known as \textit{page deduplication}. With
 this scheme, the operating system scans memory pages during idle CPU cycles, and
 looks for pages that are identical in content. It collapses those pages into a
