@@ -158,7 +158,7 @@ Square-and-Multiply. We can proceed to implement the algorithm by scanning the
 binary representation of $d$ from right to left. If the bit is $1$, we will
 multiply and then square, and if the bit is a $0$, we will just square.
 Inserting reduces to keep memory use manageble, we see that when the bit is $1$,
-we will square, reduce, multiple, and reduce, and when the bit is $0$, we will
+we will square, reduce, multiply, and reduce, and when the bit is $0$, we will
 only square and reduce.
 
 \begin{lstlisting}[caption={GnuPG 1.4.13's implementation of Square-and-Multiply
