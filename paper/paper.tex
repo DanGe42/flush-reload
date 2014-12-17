@@ -119,14 +119,14 @@ more aggressive form of page sharing known as \textit{page deduplication}. With
 this scheme, the operating system scans memory pages during idle CPU cycles, and
 looks for pages that are identical in content. It collapses those pages into a
 single page that is then shared by all processes that were accessing those
-identical pages. As a result of this page deduplication scheme,
-processes may be unknowingly or unintentionally sharing memory with one another.
-However, to prevent malicious access to the shared pages, the operating system
-maps shared pages as copy-on-write; that is, when a process wishes to write to a
-page, it must first make a local copy for itself that it can safely modify. When
-a write is requested, the CPU traps to the kernel, which then remaps a copy of
-the desired page for the process requesting the write, and then returns control
-to the calling process. Read operations in this scheme do not require such a trap
+identical pages. As a result of this page deduplication scheme, processes may be
+unknowingly or unintentionally sharing memory with one another. However, to
+prevent malicious access to the shared pages, the operating system maps shared
+pages as copy-on-write; that is, when a process wishes to write to a page, it
+must first make a local copy for itself that it can safely modify. When a write
+is requested, the CPU traps to the kernel, which then remaps a copy of the
+desired page for the process requesting the write, and then returns control to
+the calling process. Read operations in this scheme do not require such a trap
 as they do not modify the targeted page and are therefore ``safe''.
 
 \subsection{RSA}
@@ -140,7 +140,7 @@ follows. Choose two distinct prime numbers, $p$ and $q$.
     \item Choose $e, 1 \leq e \leq \phi(N)$, where $gcd(e,\phi(N)) = 1$.
     \item Compute $d = e^{-1}\ mod\ \phi(N)$
     \item Let the private key be $(d,N)$ and the public key be $(e,N)$
-\end{enumerate} 
+\end{enumerate}
 
 Encryption can be performed by calculating $c = m^e\ mod\ N$. Likewise,
 decryption is performed by calculating $m = c^d\ mod\ N$.
@@ -152,8 +152,8 @@ would then take $O(d)$ multiplications. However, there exists a much more
 efficient algorithm known as Square-and-Multiply\cite{Knuth:1997:ACP:270146}.
 This method is derived from the binary representation of the exponent $d$.
 Consider $d = \sum_{i=0}^{n-1}x_i 2^i$. Then $c^d = c^{(\sum_{i=0}^{n-1}x_i
-2^i)} = \prod_{i=0}^{n-1}c^{x_i 2^i}$. Then reducing modulo $N$ we obtain
-$m$ as desired. The following code shows GnuPG 1.4.13's implementation of
+2^i)} = \prod_{i=0}^{n-1}c^{x_i 2^i}$. Then reducing modulo $N$ we obtain $m$ as
+desired. The following code shows GnuPG 1.4.13's implementation of
 Square-and-Multiply. We can proceed to implement the algorithm by scanning the
 binary representation of $d$ from right to left. If the bit is $1$, we will
 multiply and then square, and if the bit is a $0$, we will just square.
@@ -179,11 +179,11 @@ for encryption, signing, and decryption of messages. It implements several
 public key algorithms, including DSA, ElGamal, and importantly for our purposes,
 RSA. As mentioned above, in particular, the GnuPG implementation of RSA uses
 Square-and-Multiply for modular exponentiation. As of GnuPG version 1.4.14, the
-\texttt{if} branch guarding the multiply and reduce no longer prevents that branch from
-being taken; rather, in the case of the bit being a $0$, it will simply discard
-the results of the multiply in the reduce. This was a consequence of the
-publication of the \flushreload{} attack by Yarom and Falkner\cite{YF13} that we
-will describe momentarily.
+\texttt{if} branch guarding the multiply and reduce no longer prevents that
+branch from being taken; rather, in the case of the bit being a $0$, it will
+simply discard the results of the multiply in the reduce. This was a consequence
+of the publication of the \flushreload{} attack by Yarom and Falkner\cite{YF13}
+that we will describe momentarily.
 
 The RSA implementation in GnuPG differs slightly from the general algorithm
 described above. It is sped up by computing $d_p = d\ mod\ (p-1)$ and $d_q = d\
@@ -196,12 +196,13 @@ The \flushreload{} attack takes advantage of page deduplication on modern
 processors. The basic attack works as follows: the attacker loads into memory
 some block of data that it believes the victim to also be accessing. The system
 then deduplicates these two identical pages. The attacker can then use the
-instruction \texttt{clflush} to flush memory lines in that block from the CPU caches. The
-attacker then waits for some interval $T$ and attempts to access a memory line
-in this page, and measures the time (in cycles) it takes for the line to be
-loaded. If the memory line was accessed by the victim during $T$, the time taken
-will be shorter because it will be cached, and if it was not accessed, the time taken will be longer.
-Consequently, the attacker can determine if the line was accessed during $T$.
+instruction \texttt{clflush} to flush memory lines in that block from the CPU
+caches. The attacker then waits for some interval $T$ and attempts to access a
+memory line in this page, and measures the time (in cycles) it takes for the
+line to be loaded. If the memory line was accessed by the victim during $T$, the
+time taken will be shorter because it will be cached, and if it was not
+accessed, the time taken will be longer.  Consequently, the attacker can
+determine if the line was accessed during $T$.
 
 If the attacker loads into memory some subset of instructions from the victim
 program, then it can determine parts of the execution trace of the victim, by
@@ -224,11 +225,11 @@ key is indeed recoverable.
 Our implementation of the \flushreload{} technique is an adaptation of the
 implementation as described in Yarom and Falkner\cite{YF13}. In the original
 implementation, the \texttt{probe} function measures the time taken to access a
-given address, immediately flushes the corresponding memory line from the cache, and returns
-whether the cycles elapsed stays within a fixed threshold.  We make a minor
-modification to the \texttt{probe} function---returning the number of cycles
-elapsed instead of the result of the thresholding---to allow us to obtain data
-that can be easily checked visually.
+given address, immediately flushes the corresponding memory line from the cache,
+and returns whether the cycles elapsed stays within a fixed threshold.  We make
+a minor modification to the \texttt{probe} function---returning the number of
+cycles elapsed instead of the result of the thresholding---to allow us to obtain
+data that can be easily checked visually.
 
 \begin{lstlisting}[caption={Our trivially modified probe function}]
 unsigned long probe_timing(char *adrs) {
@@ -304,10 +305,10 @@ compiled with GCC 4.9.2 (installed via \texttt{pacman} from the official Arch
 package repositories ``Core'' install group).
 
 Leaving debug symbols in the executable made it easier to map the relevant GPG
-source code lines to the addresses of the corresponding instructions in the binary's
-.text section. GPG performance is not affected because these symbols are removed
-at runtime. Finding the relevant instructions is still possible in a stripped
-GPG executable, though it will require some reverse engineering.
+source code lines to the addresses of the corresponding instructions in the
+binary's .text section. GPG performance is not affected because these symbols
+are removed at runtime. Finding the relevant instructions is still possible in a
+stripped GPG executable, though it will require some reverse engineering.
 
 We used GDB (LLDB on OS X) to find the source code line to instruction address
 mapping. As a general observation, we found that there was an offset of 0x400000
@@ -373,21 +374,21 @@ by cache level was very evident, similar to the EC2 results above. There was
 little ambiguity about which probes resulted in cache hits and which did not.
 
 As of writing, we did not examine the assembly of the GnuPG binary on OS X for
-optimal probe placement; rather, we used the method of setting breakpoints in GDB by line
-number and observing the addresses on which they were set. It is possible that
-switching methods would produce better results.
+optimal probe placement; rather, we used the method of setting breakpoints in
+GDB by line number and observing the addresses on which they were set. It is
+possible that switching methods would produce better results.
 
 \subsubsection{Arch Linux}
 
 Arch Linux provided the poorest results by far. No meaningful data were
 discernible under any configuration because there was too much timing noise
-during the spying, which, in the case of the Figure~\ref{fig:data-arch}, occurred roughly
-between timeslots 7000 and 18000 on the x-axis. Given that there were no
-significant differences between this and the configuration running on OS X, we
-were unsure why this kept occurring. The most obvious
-difference between the two systems is that GnuPG on Arch Linux was compiled
-under GCC 4.9.2 instead of GCC 4.2, as it was on OS X; however, it was not clear how
-this would change the output so drastically, or if it did at all.
+during the spying, which, in the case of the Figure~\ref{fig:data-arch},
+occurred roughly between timeslots 7000 and 18000 on the x-axis. Given that
+there were no significant differences between this and the configuration running
+on OS X, we were unsure why this kept occurring. The most obvious difference
+between the two systems is that GnuPG on Arch Linux was compiled under GCC 4.9.2
+instead of GCC 4.2, as it was on OS X; however, it was not clear how this would
+change the output so drastically, or if it did at all.
 
 Our two hypotheses for this different behaviour were that Arch Linux
 was being run as a guest OS on a Windows 8.1 host, and that it was being run on
@@ -398,9 +399,9 @@ these hypotheses were disproven by testing on a second machine running Arch
 Linux as a host OS on an older Intel Celeron CPU, in which the attack produced
 the same noisy results.
 
-Additionally, it may be the case that the addresses determined with GDB were inaccurate,
-and that probing based on addresses determined via \texttt{objdump} would produce
-better results.
+Additionally, it may be the case that the addresses determined with GDB were
+inaccurate, and that probing based on addresses determined via \texttt{objdump}
+would produce better results.
 
 \begin{figure}[h]
   \centering
@@ -474,7 +475,7 @@ perform this attack across virtual machines. That is, using the attack to steal
 data from one virtual machine whilst running the attack on another. Cross-VM
 attacks are described in further detail by Apecechea et al.
 \cite{cryptoeprint:2014:248}; the basic principle behind the attack would be to
-detect and spy upon a victim, i.e. a user on another VM, running GnuPG (or some
+detect and spy upon a victim, i.e.\ a user on another VM, running GnuPG (or some
 equivalent cryptographic process) and steal the keys used in the process. Such
 an attack clearly has its appeal: it would expose a major vulnerability in
 virtual machines, which are used in countless modern software applications.
