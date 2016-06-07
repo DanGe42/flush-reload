@@ -3,7 +3,7 @@ SHA1HASH=9b78e20328d35525af7b8a9c1cf081396910e937
 GPG_PREFIX=gnupg-1.4.12
 GPG_ARCHIVE=${GPG_PREFIX}.tar.bz2
 export CC=gcc   # If building on OS X, you will need apple-gcc42
-export CFLAGS="-g -O2"
+export CFLAGS="-g -O2 -std=c89"
 
 curl -O http://mirror.switch.ch/ftp/mirror/gnupg/gnupg/${GPG_ARCHIVE}
 shasum -a 1 -c <(echo "${SHA1HASH}  ${GPG_ARCHIVE}")
@@ -24,4 +24,4 @@ rm ${GPG_ARCHIVE}
 
 cd ${GPG_PREFIX}
 ./configure --disable-dependency-tracking --disable-asm --prefix=${PWD}
-make && make check && make install
+make && make check # && make install
