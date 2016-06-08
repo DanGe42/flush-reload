@@ -55,7 +55,7 @@ $ ./build_gpg/install_locally.sh
 
 Of course, you should never run arbitrary executable code from the Internet.
 You should verify that the scripts do what they are expected to do (they're
-pretty short). A dummy RSA key will be generated according to the parameters in the **keyparams** file and added to the keyring. Do not forget to remove it after usgae:
+pretty short). A dummy RSA key will be generated according to the parameters in the **keyparams** file and added to the keyring. Do not forget to remove it after usage:
 
 ```
 $gpg --delete-secret-and-public-keys Flush
