@@ -22,6 +22,23 @@ This technique has been demonstrated against the modular exponentiation
 procedure in GnuPG pre-1.4.14, which allows an attacker to extract the private
 RSA exponent from cache timing data.
 
+## Dependencies
+For the graph plot it uses **matplotlib**.
+
+For Ubuntu users:
+
+```
+$sudo apt-get install python-matplotlib
+```
+
+To speed up gpg key generation install **rng-tools** but it is not mandatory.
+
+For Ubuntu users:
+
+```
+$sudo apt-get install rng-tools
+```
+
 ## Setting up GPG 1.4.12
 As a proof of concept, we attacked GPG 1.4.12. To set this up, there are a few
 build scripts in the `built_gpg/` directory. On OS X, run:
@@ -33,12 +50,16 @@ $ brew install gnupg.rb
 On Linux (and also on OS X if you don't want to use Homebrew):
 
 ```
-$ ./install_locally.sh
+$ ./build_gpg/install_locally.sh
 ```
 
 Of course, you should never run arbitrary executable code from the Internet.
 You should verify that the scripts do what they are expected to do (they're
-pretty short).
+pretty short). A dummy RSA key will be generated according to the parameters in the **keyparams** file and added to the keyring. Do not forget to remove it after usage:
+
+```
+$gpg --delete-secret-and-public-keys Flush
+```
 
 ## Running our code
 Run `make` first.

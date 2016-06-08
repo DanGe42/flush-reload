@@ -18,6 +18,26 @@
 #define	MAX(a,b) (((a)>(b))?(a):(b))
 #endif	/* MAX */
 
+unsigned long probe_timing_cache(char *adrs) {
+    volatile unsigned long time;
+
+    asm __volatile__(
+        "    mfence             \n"
+        "    lfence             \n"
+        "    rdtsc              \n"
+        "    lfence             \n"
+        "    movl %%eax, %%esi  \n"
+        "    movl (%1), %%eax   \n"
+        "    lfence             \n"
+        "    rdtsc              \n"
+        "    subl %%esi, %%eax  \n"
+        : "=a" (time)
+        : "c" (adrs)
+        : "%esi", "%edx"
+    );
+    return time;
+}
+
 unsigned long probe_timing(char *adrs) {
     volatile unsigned long time;
 
@@ -57,8 +77,9 @@ struct stats {
 
 void spy(char **addrs, size_t num_addrs, int num_iterations) {
     struct stats addr_stats[num_addrs];
-
-    // init
+    
+    
+    // init for memory read
     for (size_t addr = 0; addr < num_addrs; addr++) {
         addr_stats[addr].min = (unsigned long) -1;
         addr_stats[addr].max = 0;
@@ -76,7 +97,33 @@ void spy(char **addrs, size_t num_addrs, int num_iterations) {
         }
     }
 
-    printf("Statistics after %d runs:\n", num_iterations);
+    printf("Statistics for memory after %d runs:\n", num_iterations);
+    for (size_t addr = 0; addr < num_addrs; addr++) {
+        printf("Address #%d statistics:\n", (int) addr);
+        printf("min = %lu\n", addr_stats[addr].min);
+        printf("max = %lu\n", addr_stats[addr].max);
+        printf("mean = %lu\n", addr_stats[addr].sum / num_iterations);
+    }
+
+    // init for cache read
+    for (size_t addr = 0; addr < num_addrs; addr++) {
+        addr_stats[addr].min = (unsigned long) -1;
+        addr_stats[addr].max = 0;
+        addr_stats[addr].sum = 0;
+    }
+
+    for (int i = 0; i < num_iterations; i++) {
+        for (size_t addr = 0; addr < num_addrs; addr++) {
+            char *ptr = addrs[addr];
+            unsigned long result = probe_timing_cache(ptr);
+
+            addr_stats[addr].min = MIN(addr_stats[addr].min, result);
+            addr_stats[addr].max = MAX(addr_stats[addr].max, result);
+            addr_stats[addr].sum += result;
+        }
+    }
+
+    printf("Statistics for cache after %d runs:\n", num_iterations);
     for (size_t addr = 0; addr < num_addrs; addr++) {
         printf("Address #%d statistics:\n", (int) addr);
         printf("min = %lu\n", addr_stats[addr].min);
