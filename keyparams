@@ -1,0 +1,12 @@
+%echo Generating a RSA key for Flush + Reload test
+     Key-Type: RSA
+     Key-Length: 2048
+     Name-Real: Flush Reload
+     Name-Comment: For test only
+     Name-Email: flush.reload@cache.bar
+     Expire-Date: 0
+     %no-protection
+     %pubring flushreload.pub
+     %secring flushreload.sec
+     %commit
+     %echo done
