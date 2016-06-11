@@ -1,4 +1,5 @@
-IDIR=include
+SRC=src
+IDIR=$(SRC)/include
 CC=gcc
 CFLAGS=-Wall --std=gnu99 -I$(IDIR) -g
 
@@ -18,11 +19,11 @@ probe: $(OBJ)
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $(BDIR)/$@ $^
 
-$(ODIR)/%.o: %.c $(DEPS)
+$(ODIR)/%.o: $(SRC)/%.c $(DEPS)
 	mkdir -p obj
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-measure_l1: measure_l1.c
+measure_l1: $(SRC)/measure_l1.c
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $(BDIR)/$@ $?
 

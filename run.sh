@@ -1,7 +1,7 @@
 #!/bin/sh
 
 GPG=$HOME/gnupg-1.4.12/bin/gpg
-ADDR=addr/osx.txt
+ADDR=docs/addr/osx.txt
 MESSAGE=message.txt
 OUT=out.txt
 CYCLES=$1
