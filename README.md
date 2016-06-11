@@ -71,3 +71,5 @@ FLUSH+RELOAD attack:
 * [Cache Template Attacks: Automating Attacks on Inclusive Last-Level
   Caches](https://www.usenix.org/system/files/conference/usenixsecurity15/sec15-paper-gruss.pdf)
   (Suggested by a passing university student who asked us questions about our code)
+* [Make Sure DSA Signing Exponentiations Really are Constant-Time](https://eprint.iacr.org/2016/594.pdf)
+  (A recent OpenSSL DSA key recovery attack co-authored by Yarom)
