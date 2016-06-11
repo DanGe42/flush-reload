@@ -1,5 +1,4 @@
-FLUSH+RELOAD
-============
+# FLUSH+RELOAD
 
 ## Authors
 [Daniel Ge](https://github.com/DanGe42),
@@ -58,3 +57,17 @@ Also, note that the annotated EC2 file does not have line numbers. We ended up
 digging into the disassembly to find those addresses, which, in that case, were
 ones corresponding to addresses close to the `retq` instruction for those
 functions. More details are in our linked implementation paper.
+
+## More papers to read
+As a result of our unexpected Google search ranking for "flush+reload", we have
+seen a slight uptick of interest in our code (just a couple of emails, really).
+While we can't answer every question, we do have suggestions for papers worth
+reading for anyone who is looking to apply/extend the principles of the
+FLUSH+RELOAD attack:
+
+* [Wait a minute! A fast, Cross-VM attack on AES](https://eprint.iacr.org/2014/435.pdf)
+* [Seriously, get off my cloud! Cross-VM RSA Key Recovery in a Public Cloud](https://eprint.iacr.org/2015/898.pdf)
+* [Cross Processor Cache Attacks](https://eprint.iacr.org/2015/1155.pdf)
+* [Cache Template Attacks: Automating Attacks on Inclusive Last-Level
+  Caches](https://www.usenix.org/system/files/conference/usenixsecurity15/sec15-paper-gruss.pdf)
+  (Suggested by a passing university student who asked us questions about our code)
