@@ -1,3 +1,6 @@
+# This is an OS X Homebrew formula. If you have Homebrew installed, you can
+# use this to install Homebrew via `brew install path/to/gnupg.rb`.
+
 require "formula"
 
 class Gnupg < Formula
