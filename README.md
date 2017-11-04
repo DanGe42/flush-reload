@@ -1,5 +1,13 @@
 # FLUSH+RELOAD
 
+## Notice
+
+This project is unmaintained and somewhat outdated now. We may continue to
+answer questions or respond to issues, but not in a timely manner.
+
+[This other project](https://github.com/defuse/flush-reload-attacks) appears
+to be an improved implementation of the attack.
+
 ## Authors
 [Daniel Ge](https://github.com/DanGe42),
 [David Mally](https://github.com/djmally),
